@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ru" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>EZMONEY</title>
+    <script src="https://unpkg.com/@vkontakte/vk-connect/dist/index.umd.js" charset="utf-8"></script>
+  </head>
+  <body>
+    <div class="ctn">
+      <div class="loader_box">
+        <div class="loader_text">Загрузка...</div>
+      </div>
+      <div class="d-none btn go_d" href="https://vk.me/ezmoneybots" target="_blank">Начать заработок!</div>
+      <a class="d-none btn back_d" href="https://vk.me/ezmoneybots" target="_blank">Перейти к диалогу</a>
+    </div>
+  </body>
+</html>
+
+
+<style media="screen">
+  .d-none {
+    display: none !important;
+  }
+  .btn {
+    text-decoration: none;
+    outline: none;
+    display: inline-block;
+    margin: 10px 20px;
+    padding: 10px 30px;
+    position: relative;
+    border: 2px solid #f1c40f;
+    color: #f1c40f;
+    font-family: 'Montserrat', sans-serif;
+    transition: .4s;
+    cursor: pointer;
+  }
+  .btn:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    margin: auto;
+    border: 2px solid rgba(0,0,0,0);
+    transition: .4s;
+  }
+  .ctn .btn:hover:after {
+    border-color: #f1c40f;
+    width: calc(100% - 10px);
+    height: calc(100% + 10px);
+  }
+  .ctn{
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+</style>
+
+<script type="text/javascript">
+
+  vkConnect.send('VKWebAppInit');
+  vkConnect.send("VKWebAppGetUserInfo");
+
+  let btn_act = document.querySelector('.go_d');
+  let btn_act_back = document.querySelector('.back_d');
+  let loader_box = document.querySelector('.loader_box');
+  let vk_id;
+
+  console.log(btn_act_back);
+
+  vkConnect.subscribe(async e => {
+    console.log(e);
+    if (e.detail != undefined) {
+      let ev = e.detail;
+      console.log(ev);
+      let type_event = ev.type;
+      let data_event = ev.data;
+
+      if (type_event == 'VKWebAppGetUserInfoResult') {
+        vk_id = data_event.id;
+        init(vk_id);
+      }
+      else if (type_event == 'VKWebAppAllowMessagesFromGroupResult') {
+        tg_status(vk_id);
+      }
+    }
+  });
+
+
+async function tg_status (vk_id) {
+  let params = {
+    route: '#tgst/',
+    vk_id: vk_id
+  };
+  let formBody = searilize(params);
+  let pre_res = await fetch('https://ezbot.site/app', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: formBody
+  });
+
+  if (pre_res.ok) {
+    let res = await pre_res.json();
+    console.log(res);
+  } else {
+    console.error(pre_res);
+  }
+
+
+}
+
+
+
+async function handler (name, pass, param = {}) {
+
+}
+
+async function loadpage (page, pass) {
+
+}
+
+async function init (vk_id) {
+  let hash = window.location.hash;
+  let route = hash.replace('#', '');
+  if (route.indexOf('admin') > -1) {
+    let pass = 123;
+    let page = route.replace('admin/', '');
+    loadpage(page, pass);
+    return;
+  }
+
+  let params = {
+    route: window.location.hash,
+    vk_id: vk_id
+  };
+  let formBody = searilize(params);
+  let pre_res = await fetch('https://ezbot.site/app', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: formBody
+  });
+
+  if (pre_res.ok) {
+    let res = await pre_res.json();
+    console.log(res);
+    if (res.status == 'new') {
+      btn_act.classList.remove('d-none');
+      vkConnect.send("VKWebAppAllowMessagesFromGroup", {"group_id": 187786454});
+    } else {
+      btn_act_back.classList.remove('d-none');
+    }
+  //  vkConnect.send("VKWebAppAllowMessagesFromGroup", {"group_id": 187786454});
+    loader_box.classList.add('d-none');
+  } else {
+    console.error(pre_res);
+  }
+}
+
+function go_dialog () {
+  alert('Зайди в личные сообщения');
+}
+
+
+function searilize (params) {
+  let formBody = [];
+  for (let property in params) {
+    var encodedKey = encodeURIComponent(property);
+    var encodedValue = encodeURIComponent(params[property]);
+    formBody.push(encodedKey + "=" + encodedValue);
+  }
+  formBody = formBody.join("&");
+  return formBody;
+}
+  //vkConnect.send("VKWebAppGetCommunityAuthToken", {"app_id": 7177293, "group_id": 187786454, "scope": "app_widget"});
+
+</script>

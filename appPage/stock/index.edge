@@ -1,0 +1,93 @@
+@layout('layouts.admin')
+
+@section('title')
+Редактирование акций
+@endsection
+
+
+@section('content')
+
+<div class="action_container">
+  <div class="add_block_stock" onclick="change_page('stock.change')">+</div>
+  @each(stock in data)
+    <div class="stock_block {{stock.status ? 'active' : ''}}">
+      <h3 class="name">{{stock.name}}</h3>
+      <div class="descr ui">{{stock.descr}}</div>
+      <div class="btn_ctn">
+        <button type="button" name="button-delete" data-uid="{{stock.uid}}" onclick="open_modal_stock({{stock.uid}})" class="btn_stock remove">Удалить</button>
+        <button type="button" name="button-edit" data-uid="{{stock.uid}}" class="btn_stock edit" onclick="change_page('stock.change', {'uid': {{stock.uid}} })">Редактировать</button>
+      </div>
+    </div>
+  @endeach
+</div>
+
+
+
+<style media="screen">
+  .action_container {
+    height: max-content;
+  }
+  .add_block_stock:hover{
+    filter: brightness(80%);
+  }
+
+  .add_block_stock{
+    width: 100%;
+    height: 100px;
+    border: 2px dashed #ccc;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #00a674;
+    font-size: 40px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    user-select: none;
+  }
+
+  .btn_stock.edit {
+    background: #dc9908;
+  }
+  .btn_stock.remove {
+    background: #d03b2d;
+  }
+  .btn_stock:hover{
+    filter: brightness(80%);
+  }
+  .btn_stock:first-child{
+    margin-right: 5px;
+  }
+  .btn_stock {
+    width: 100%;
+    height: 35px;
+    outline: none;
+    border-radius: 2px;
+    color: #fff;
+    border: none;
+    transition: 0.2s;
+    cursor: pointer;
+  }
+  .btn_ctn {
+    margin-top: auto;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .stock_block {
+    background: #fff;
+    width: 100%;
+    min-height: 100px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  .descr{
+    font-size: 0.8em;
+    color: #5e5e5e;
+    margin-bottom: 10px;
+  }
+</style>
+
+
+@endsection

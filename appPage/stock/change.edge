@@ -1,0 +1,186 @@
+@layout('layouts.admin')
+
+@section('title')
+@if(data != undefined)
+  Редактирование акции №{{data.uid}}
+@else
+  Добавление акции
+@endif
+
+@endsection
+
+
+@section('content')
+<div class="action_container">
+  <div class="form_group">
+    <label class="form-control">
+      <p>Название акции</p>
+      <input type="text" name="name" value="{{data != undefined ? data.name : ''}}" placeholder="Новая акция">
+    </label>
+    <label class="form-control">
+      <p>Описание акции</p>
+      <textarea name="descr" rows="8" cols="80" placeholder="Акция на 30 ноября ...">{{data != undefined ? data.descr : ''}}</textarea>
+    </label>
+    <label class="form-control">
+      <p>Акция активна</p>
+      <select name="status">
+        <option value="1"  {{data.status == true ? 'selected' : ''}}>Вкл.</option>
+        <option value="0" {{data.status == false ? 'selected' : ''}}>Выкл.</option>
+      </select>
+    </label>
+    <h4 class="title_cond">Условия</h4>
+    <div class="conditions">
+
+      @each(cond in data.data)
+
+      <div class="cond_block">
+        <input type="number" name="invoce" placeholder="" value="{{cond.invoce}}" class="elem">
+        <select name="type_b" class="elem">
+          <option value="num"  {{cond.type_bonus == 'num' ? 'selected' : ''}}>₽</option>
+          <option value="proc" {{cond.type_bonus == 'proc' ? 'selected' : ''}}>%</option>
+        </select>
+        <input type="number" name="bonus" placeholder="" value="{{cond.bonus}}" class="elem">
+        <button type="button" class="elem delete_cond btn_stock" data-index="{{$loop.index}}" onclick="delete_stock(event)">
+          <i class="close icon" data-index="{{$loop.index}}"></i>
+        </button>
+      </div>
+
+      @endeach
+
+    </div>
+    <button type="button" name="button" onclick="add_stock()" class="btn_stock add_cond">Добавить условие</button>
+    <div class="btn_ctn">
+      <button type="button" name="button" class="btn_stock back" onclick="change_page('stock.index')">Назад</button>
+      <button type="button" name="button" class="btn_stock save" data-uid="{{data != undefined ? data.uid : 0}}" data-type="{{data == undefined ? 'create_stock' : 'update_stock'}}" onclick="init_stocks(true)">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+
+<style media="screen">
+.cond_block .elem:nth-child(2n) {
+  width: 15%;
+  margin: 0 10px;
+}
+.cond_block .elem:last-child {
+  margin-right: 0;
+}
+.cond_block .elem {
+  width: 35%;
+  height: 35px;
+  display: block;
+}
+.cond_block{
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.conditions{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+
+.btn_stock.delete_cond i{
+  color: #fff;
+}
+.btn_stock.delete_cond {
+  background: #d03b2d;
+}
+.btn_stock.add_cond {
+  background: #dc9908;
+  margin-bottom: 10px;
+}
+.btn_stock.back {
+  background: #4267b2;
+}
+.btn_stock.save {
+  background: #59a969;
+}
+.btn_stock:hover{
+  filter: brightness(80%);
+}
+.btn_stock:first-child{
+  margin-right: 5px;
+}
+.btn_stock {
+  width: 100%;
+  height: 35px;
+  outline: none;
+  border-radius: 2px;
+  color: #fff;
+  border: none;
+  transition: 0.2s;
+  cursor: pointer;
+}
+.btn_ctn {
+  margin-top: auto;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+
+.title_cond{
+  width: 100%;
+  text-align: center;
+}
+
+
+.form-control textarea::placeholder {
+  color: #ccc;
+}
+.form-control input::placeholder {
+  color: #ccc;
+}
+.form-control textarea {
+  width: 100%;
+  min-height: 100px;
+  border: 1px solid #334255;
+  border-radius: 2px;
+  padding: 5px;
+  resize: vertical;
+}
+.form-control input[name=status] {
+  height: 20px;
+  width: 20px;
+}
+.form-control input {
+  width: 100%;
+  height: 30px;
+  border: 1px solid #334255;
+  border-radius: 2px;
+  padding: 0 5px 0 5px;
+}
+.form-control p {
+  color: #bbb;
+  font-size: 0.8em;
+  margin-bottom: 5px;
+}
+.form-control{
+  width: 100%;
+  margin-bottom: 10px;
+  color: #000;
+  display: block;
+}
+.form_group{
+  width: 100%;
+  background: #fff;
+  padding: 10px;
+}
+
+
+</style>
+
+<script type="text/javascript">
+@if(data != undefined)
+init_stocks();
+@endif
+</script>
+
+
+@endsection

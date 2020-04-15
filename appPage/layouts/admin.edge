@@ -1,0 +1,137 @@
+<div class="header_title">
+  <h4 class="ui header">
+    <div class="btn_eff" onclick="open_menu()">
+      <i class="icon list"></i>
+    </div>
+    <div class="content">
+      @section('title')
+      EZMONEY
+      @endsection
+    </div>
+  </h4>
+</div>
+<div class="main_block">
+  <div class="vertical-sidebar">
+    <div class="nav_elem {{page == 'config' ? 'active' : ''}}" onclick="change_page('config')">Конфиг</div>
+    <div class="nav_elem {{page == 'bonus' ? 'active' : ''}}" onclick="change_page('bonus')">Бонусы</div>
+    <div class="nav_elem {{page == 'stock.index' ? 'active' : ''}}" onclick="change_page('stock.index')">Акции</div>
+    <div class="nav_elem {{page == 'tasks' ? 'active' : ''}}" onclick="change_page('tasks')">Задания</div>
+  </div>
+  <div class="content-block">
+    @!section('content')
+  </div>
+</div>
+
+<script type="text/javascript">
+
+
+
+
+
+
+
+</script>
+
+<style media="screen">
+  .content-block {
+    width: 100%;
+    padding: 10px;
+    height: max-content;
+  }
+  .vertical-sidebar .nav_elem.active{
+    background: #1a2430;
+    color: #fff;
+  }
+  .vertical-sidebar .nav_elem:hover{
+    color: #fff;
+  }
+  .vertical-sidebar .nav_elem{
+    height: 35px;
+    display: flex;
+    align-items: center;
+    color: #ddd;
+    margin-bottom: 5px;
+    padding-left: 10px;
+    cursor: pointer;
+  }
+  .vertical-sidebar.show{
+    left: 0px;
+  }
+  .vertical-sidebar{
+    left: -200px;
+    width: 200px;
+    height: 100%;
+    background-color: #334255;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    transition: 0.2s;
+  }
+  .header_title .header .btn_eff .icon{
+    margin-right: 0;
+    width: 15px;
+    height: 15px;
+    margin-top: -2px;
+  }
+  .header_title .header .btn_eff{
+    width: 40px;
+    height: 35px;
+    background: rgba(0,0,0,0.25);
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .header_title .header .content{
+    color: #fff;
+    display: flex;
+    align-items: center;
+    margin-left: 15px;
+  }
+  .header_title .header {
+    color: #fff;
+    display: flex;
+  }
+  .header_title {
+    width: 100%;
+    height: 70px;
+    background-color: #334255;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+  }
+  .main_block {
+    width: 100%;
+    height: 100vh;
+    background: #edeef0;
+    display: flex;
+    position: relative;
+    overflow-y: auto;
+  }
+  .nav_bar--bottom{
+    margin-top: auto;
+    height: 60px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    background: #edeef0;
+  }
+  .nav_bar--bottom .nav_elem {
+    background: #fafbfc;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-left: 2px solid #edeef0;
+    border-right: 2px solid #edeef0;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    margin: 0 2px;
+    width: 100%;
+    box-shadow: 0px -2px 5px rgba(0,0,0,0.5);
+    transition: 0.2s;
+  }
+  .nav_bar--bottom .nav_elem.active{
+    transform: translateY(10px);
+  }
+</style>

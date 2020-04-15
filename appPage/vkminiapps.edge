@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ru" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>EZMONEY</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <script src="https://unpkg.com/@vkontakte/vk-connect/dist/index.umd.js" charset="utf-8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.0"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+            crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+
+    <script src="/static/js/stock.js" charset="utf-8"></script>
+  </head>
+  <body>
+    <div class="overflow_load">
+      <div class="load_text">Загружаю</div>
+    </div>
+    <div class="ctn">
+      <div class="loader_box">
+        <img src="/static/img/logo.jpg" alt="" class="loader_img">
+        <div class="ui active centered inline loader loader_elem inverted"></div>
+      </div>
+      <div class="d-none btn go_d" href="https://vk.me/ezmoneybots" target="_blank">Начать заработок!</div>
+      <a class="d-none btn back_d" href="https://vk.me/ezmoneybots" target="_blank">Перейти к диалогу</a>
+    </div>
+
+    <div class="ui modal stock_modal">
+      <div class="header">Удаление акции</div>
+      <div class="content">
+        <p>Щедрые выходные</p>
+      </div>
+      <div class="actions">
+        <div class="ui cancel blue button">Отмена</div>
+        <div class="ui ok red button">Удалить</div>
+      </div>
+    </div>
+
+
+    <div class="ctn_msg_block">
+      <div class="ui hidden message">
+        <p>...</p>
+      </div>
+    </div>
+
+
+  </body>
+</html>
+
+<style media="screen">
+  .overflow_load .load_text{
+    color: #fff;
+    font-size: 1.2em;
+    font-weight: bold;
+  }
+  .overflow_load.show{
+    pointer-events: all;
+    opacity: 1;
+  }
+  .overflow_load{
+    width: 100%;
+    height: 100vh;
+    background: rgba(0,0,0,0.75);
+    position: fixed;
+    opacity: 0;
+    transition: 0.2s;
+    pointer-events: none;
+    z-index: 99;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .ctn_msg_block{
+    width: 100%;
+    height: 50px;
+    position: absolute;
+    top: calc(100% - 50px);
+    padding: 0 20px;
+    z-index: 100;
+    pointer-events: none;
+  }
+  * {
+    margin: 0;
+    padding: 0;
+  }
+  .d-none {
+    display: none !important;
+  }
+  .d-op {
+    opacity: 0;
+  }
+  .loader_box{
+    width: 100%;
+    height: 100vh;
+    background-color: #334255;
+    flex-direction: column;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition-property: opacity;
+    transition-duration: 0.5s;
+  }
+  .loader_box .loader_img{
+    width: 250px;
+    height: 250px;
+    margin-bottom: -50px;
+  }
+  .loader_box .loader_elem{
+    color: #fff;
+  }
+  .btn {
+    text-decoration: none;
+    outline: none;
+    display: inline-block;
+    margin: 10px 20px;
+    padding: 10px 30px;
+    position: relative;
+    border: 2px solid #f1c40f;
+    color: #f1c40f;
+    font-family: 'Montserrat', sans-serif;
+    transition: .4s;
+    cursor: pointer;
+  }
+  .btn:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    margin: auto;
+    border: 2px solid rgba(0,0,0,0);
+    transition: .4s;
+  }
+  .ctn .btn:hover:after {
+    border-color: #f1c40f;
+    width: calc(100% - 10px);
+    height: calc(100% + 10px);
+  }
+  .ctn{
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    overflow: hidden;
+  }
+</style>
+
+<script type="text/javascript">
+
+  let first_load = true;
+  let open_menu_status = false;
+  let passw_a = undefined;
+  @if(code != undefined)
+  passw_a = '{{code}}';
+  @endif
+
+
+
+  let open_menu = function open_menu () {
+    document.querySelector('.vertical-sidebar').classList.toggle('show');
+  }
+
+  function msg_model_show (color, msg) {
+    $('.ctn_msg_block .message').removeClass('hidden');
+    $('.ctn_msg_block .message').addClass(color);
+    $('.ctn_msg_block .message p').text(msg);
+    setTimeout(() => {
+      $('.ctn_msg_block .message').addClass('hidden');
+      $('.ctn_msg_block .message').removeClass(color);
+      $('.ctn_msg_block .message p').text('');
+    }, 3000);
+  }
+
+  window.tg_o_load = function tg_o_load (status, text) {
+    $('.overflow_load .load_text').text(text);
+    if (status) {
+      $('.overflow_load').addClass('show');
+    }
+    else {
+      $('.overflow_load').removeClass('show');
+    }
+  }
+
+  vkConnect.send('VKWebAppInit');
+  vkConnect.send("VKWebAppGetUserInfo");
+  vkConnect.send("VKWebAppSetViewSettings", {"status_bar_style": "light", "action_bar_color": "#334255"});
+  // vkConnect.send("VKWebAppSetViewSettings", {"status_bar_style": "light", "action_bar_color": "#000"});
+
+  let btn_act = document.querySelector('.go_d');
+  let btn_act_back = document.querySelector('.back_d');
+  let loader_box = document.querySelector('.loader_box');
+  let vk_id;
+  let param_send = {};
+  let l_page = false;
+
+  vkConnect.subscribe(async e => {
+    if (e.detail != undefined) {
+      let ev = e.detail;
+      let type_event = ev.type;
+      let data_event = ev.data;
+
+      if (type_event == 'VKWebAppGetUserInfoResult') {
+        vk_id = data_event.id;
+        init(vk_id);
+      }
+      else if (type_event == 'VKWebAppGetUserInfoFailed ') {
+        document.location.href = 'https://vk.com/ezmoneybots';
+      }
+      else if (type_event == 'vk-connect') {
+        document.location.href = 'https://vk.com/ezmoneybots';
+      }
+      else if (type_event == 'VKWebAppAllowMessagesFromGroupResult') {
+        tg_status(vk_id);
+      }
+      else if (type_event == 'VKWebAppSetLocationResult') {
+        if (l_page == false) {
+          l_page = true;
+          init();
+        }
+      }
+    }
+  });
+
+
+let change_page = function (page, params = {}) {
+  tg_o_load(true, 'Загружаю страницу');
+  param_send = params;
+  let pg = 'admin/'+page;
+  window.location.hash = pg;
+  vkConnect.send("VKWebAppSetLocation", {"location": pg});
+};
+
+window.addEventListener('hashchange', function(e) {
+  if (l_page == false) {
+    l_page = true;
+    init();
+  }
+});
+
+
+async function tg_status (vk_id) {
+  let params = {
+    route: '#tgst/',
+    vk_id: vk_id
+  };
+  let formBody = searilize(params);
+  let pre_res = await fetch('https://ezbot.site/app', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: formBody
+  });
+
+  if (pre_res.ok) {
+    let res = await pre_res.json();
+  } else {
+    console.error(pre_res);
+  }
+}
+async function handler (name, param = {}) {
+  return new Promise(async (resolve, reject) => {
+    window.tg_o_load(true, 'Выполняю действие');
+    if (passw_a == undefined) {
+      reject('unautharization');
+    }
+    let params = {
+      name_func: name,
+      pass: passw_a
+    };
+    Object.assign(params, param);
+    let formBody = searilize(params);
+    let pre_res = await fetch('https://ezbot.site/app/admin/handler', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: formBody
+    });
+    if (pre_res.ok) {
+      let res = await pre_res.json();
+      resolve(res);
+    } else { console.error(pre_res); }
+    window.tg_o_load(false, 'Выполняю действие');
+  });
+}
+
+async function loadpage (page, pass, vk_id) {
+  let params = {
+    page: page,
+    pass: pass,
+    vk_id: vk_id
+  };
+  Object.assign(params, param_send);
+  let formBody = searilize(params);
+  let pre_res = await fetch('https://ezbot.site/app/admin/loader', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: formBody
+  });
+
+  if (pre_res.ok) {
+    let res = await pre_res.text();
+    if (first_load) {
+      document.querySelector('.loader_box').classList.add('d-op');
+      setTimeout(() => {
+        document.querySelector('.loader_box').classList.add('d-none');
+        document.querySelector('.loader_box').classList.remove('d-op');
+        insert_content(res, false);
+        first_load = false;
+      }, 400);
+    } else {
+      insert_content(res);
+    }
+    tg_o_load(false, 'Загружаю страницу');
+    l_page = false;
+  } else {
+    console.error(pre_res);
+  }
+}
+
+function insert_content(content, del = true){
+  let range = document.createRange();
+  if (del) {
+    var d = document.querySelector("body");
+    var d_nested = document.querySelector(".ctn");
+    d.removeChild(d_nested);
+    let ctn = document.createElement("div");
+    ctn.classList.add('ctn');
+    (document.querySelector('body')).appendChild(ctn);
+  }
+  range.selectNode(document.querySelector(".ctn"));
+  let documentFragment = range.createContextualFragment(content);
+
+  (document.querySelector('.ctn')).appendChild(documentFragment);
+}
+
+
+async function init (vk_id) {
+  if (passw_a == undefined){
+    return;
+  }
+
+  let hash = window.location.hash;
+  let route = hash.replace('#', '');
+  if (route.indexOf('admin') > -1) {
+    let pass = passw_a;
+    let page = route.replace('admin/', '');
+    loadpage(page, pass, vk_id);
+    return;
+  }
+
+  let params = {
+    route: window.location.hash,
+    vk_id: vk_id
+  };
+  let formBody = searilize(params);
+  let pre_res = await fetch('https://ezbot.site/app', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: formBody
+  });
+
+  if (pre_res.ok) {
+    let res = await pre_res.json();
+    console.log(res);
+    if (res.status == 'new') {
+      btn_act.classList.remove('d-none');
+      vkConnect.send("VKWebAppAllowMessagesFromGroup", {"group_id": 187786454});
+    } else {
+      btn_act_back.classList.remove('d-none');
+    }
+  //  vkConnect.send("VKWebAppAllowMessagesFromGroup", {"group_id": 187786454});
+    loader_box.classList.add('d-none');
+  } else {
+    console.error(pre_res);
+  }
+}
+
+function go_dialog () {
+  alert('Зайди в личные сообщения');
+}
+
+
+function searilize (params) {
+  let formBody = [];
+  for (let property in params) {
+    var encodedKey = encodeURIComponent(property);
+    var encodedValue = encodeURIComponent(params[property]);
+    formBody.push(encodedKey + "=" + encodedValue);
+  }
+  formBody = formBody.join("&");
+  return formBody;
+}
+  //vkConnect.send("VKWebAppGetCommunityAuthToken", {"app_id": 7177293, "group_id": 187786454, "scope": "app_widget"});
+
+</script>
